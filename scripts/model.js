@@ -172,4 +172,5 @@ export function formatDate(date) {
 export function sortScores(scores) {
   // TODO: copy the array, then sort by durationSeconds ascending.
   // Hint: [...scores] makes a copy so the original is left untouched.
+  return [...scores].sort((a, b) => a.durationSeconds - b.durationSeconds);
 }
