@@ -12,7 +12,7 @@
 // passes all of model.test.js. The three helpers are done for you.
 // =====================================================================
 
-export const EMPTY = -1
+export const EMPTY = -1;
 
 // A sample starting puzzle (matches the board on your Lab 02 page).
 export const SAMPLE_BOARD = [
@@ -25,7 +25,7 @@ export const SAMPLE_BOARD = [
   [EMPTY, EMPTY, 1, 8, EMPTY, EMPTY, 6, EMPTY, EMPTY],
   [EMPTY, 3, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, 8, EMPTY],
   [EMPTY, EMPTY, 6, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-]
+];
 
 // ---------------------------------------------------------------------
 // Provided helpers (done for you). Two cells are given as (row, col).
@@ -33,19 +33,21 @@ export const SAMPLE_BOARD = [
 
 /** True if the two cells are in the same row. */
 export function sameRow(r1, c1, r2, c2) {
-  return r1 === r2
+  return r1 === r2;
 }
 
 /** True if the two cells are in the same column. */
 export function sameColumn(r1, c1, r2, c2) {
-  return c1 === c2
+  return c1 === c2;
 }
 
 /** True if the two cells are in the same 3x3 block. */
 export function sameBlock(r1, c1, r2, c2) {
-  const firstRow = Math.floor(r1 / 3) * 3
-  const firstCol = Math.floor(c1 / 3) * 3
-  return r2 >= firstRow && r2 <= firstRow + 2 && c2 >= firstCol && c2 <= firstCol + 2
+  const firstRow = Math.floor(r1 / 3) * 3;
+  const firstCol = Math.floor(c1 / 3) * 3;
+  return (
+    r2 >= firstRow && r2 <= firstRow + 2 && c2 >= firstCol && c2 <= firstCol + 2
+  );
 }
 
 // ---------------------------------------------------------------------
@@ -55,6 +57,7 @@ export function sameBlock(r1, c1, r2, c2) {
 /** Read the value at (row, col): a digit 1-9, or EMPTY (-1). */
 export function getCell(board, row, col) {
   // TODO: return the value stored at board[row][col]
+  return board[row][col];
 }
 
 /**
@@ -65,6 +68,17 @@ export function getCell(board, row, col) {
  */
 export function setCell(board, row, col, value) {
   // TODO: return a new 9x9 board with exactly one cell changed
+  // basically want to go through the board qithe map
+  // while going want to keep track of the current row and its index
+  // then we want to see if we're on the correct row
+  // if false go to r, which is just keeping original row
+  // if true then we want to go through the cells
+  // then want to see if we're on the correct column
+  // if false then column is just c, nothing changes
+  // if true then we want to change the value to the new value
+  return board.map((r, rIndex) =>
+    rIndex === row ? r.map((c, cIndex) => (cIndex === col ? value : c)) : r,
+  );
 }
 
 /**
@@ -77,11 +91,58 @@ export function setCell(board, row, col, value) {
  */
 export function findConflicts(board, row, col) {
   // TODO: return an array of [row, col] pairs that conflict with (row, col)
+  // kind of helped to put this in python/plain english first, then translate to JS
+  // so obv want to have a final conflicts array to return at the end
+  // and we can initialize out target
+  // as a base case, if target is empty than there is a conflict
+  // then want to go through each row and cell hence the nested for loop
+  // we want to skip the target cell itself and different values
+  // if there is same row col or block then conflict so add to the array
+  // then return the array
+
+  const conflict = [];
+  const targetValue = getCell(board, row, col);
+
+  if (targetValue === EMPTY) {
+    return conflict;
+  }
+
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (r === row && c === col) {
+        continue;
+      }
+
+      if (getCell(board, r, c) != targetValue) {
+        continue;
+      }
+
+      if (
+        sameRow(r, c, row, col) ||
+        sameColumn(r, c, row, col) ||
+        sameBlock(r, c, row, col)
+      ) {
+        conflict.push([r, c]);
+      }
+    }
+  }
+  return conflict;
 }
 
 /** True when every cell is filled (no EMPTY) and nothing conflicts. */
 export function isComplete(board) {
   // TODO: false if any cell is EMPTY or has conflicts; otherwise true
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (getCell(board, r, c) === EMPTY) {
+        return false;
+      }
+      if (findConflicts(board, r, c).length > 0) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 // ---------------------------------------------------------------------
@@ -93,11 +154,18 @@ export function isComplete(board) {
 export function formatDuration(durationSeconds) {
   // TODO: whole minutes, then zero-padded seconds.
   // Hint: String(n).padStart(2, '0')
+  const minutes = Math.floor(durationSeconds / 60);
+  const second = durationSeconds % 60;
+  return `${minutes}:${String(second).padStart(2, "0")}`;
 }
 
 /** Format a Date as "YYYY/MM/DD" (e.g. "2021/03/02"). */
 export function formatDate(date) {
   // TODO: getFullYear(), getMonth() + 1, getDate() - month/day zero-padded
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}/${month}/${day}`;
 }
 
 /** A NEW array of scores sorted fastest-first, without mutating the input. */
